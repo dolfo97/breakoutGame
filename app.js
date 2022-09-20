@@ -1,6 +1,6 @@
 const canvas = document.getElementById("breakout");
 const ctx = canvas.getContext('2d');
-const paddleHeight = 15; 
+const paddleHeight = 25; 
 const paddleWidth = 155;
 const paddleMarginBottom = 15;
 let paddleZ = (canvas.width - paddleWidth) / 2;
@@ -14,6 +14,8 @@ let level = 1;
 let background = new Image();
 const scoreboard = document.querySelector('.scoreboard');
 const ballRadius = 15;
+let playing = false;
+let startButton;
 
 const lifeImg = new Image();
 lifeImg.src = 'heart.png';
@@ -43,7 +45,7 @@ ctx.lineWidth = 3;
 function drawPaddle() {
     ctx.fillStyle = "darkblue";
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-    ctx.strokeStyle = 'black';
+    ctx.strokeStyle = 'orange';
     ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
     }
 
@@ -84,7 +86,7 @@ const ball = {
     x: canvas.width/2,
     y: paddle.y - ballRadius,
     radius: ballRadius,
-    speed: 4,
+    speed: 25,
     dx: 3 * (Math.random() * 2 - 1),
     dy: -3,
 }
@@ -123,7 +125,7 @@ function moveBall() {
 
 
  const brick = {
-    row: 5,
+    row: 3,
     column: 6,
     width: 80,
     height: 25,
@@ -177,14 +179,13 @@ function brickCollision() {
                         b.status = false;
                         sounds.breakBreak.play();
                         score++;
-                        if (score === brick.row * brick.column) {
+                        if (score === 72) {
                             sounds.sfx.pause();
                             sounds.youWin.play();
-                            
                             alert('You Win!!');
                             document.location.reload();
                             clearInterval(interval);
-                        }
+                         }
                 }
             }
         }
@@ -193,19 +194,26 @@ function brickCollision() {
 
 function gameStats(text, textX, textY, img, imgX, imgY) {
     ctx.fillStyle = '#FFF';
-    ctx.font = '25px Arial';
+    ctx.font = '25px Ostrich Sans';
     ctx.fillText(text, textX, textY);
     ctx.drawImage(img, imgX, imgY, width = 25, height = 25);
 }
+function levelUp() {
+    let isLevelDone = true;
 
-
-
-
-
-
-
-
-
+    for(let r = 0; r < brick.row; r++) {
+        for(let c = 0; c < brick.column; c++){
+            isLevelDone = isLevelDone && ! bricks[r][c].status;
+        }
+    }
+    if(isLevelDone){
+        brick.row++;
+        createBricks();
+        ball.speed++;
+        //resetball();
+        level++;
+    }
+}
 
 
 function draw() {
@@ -218,6 +226,7 @@ function draw() {
     moveBall();
     sounds.sfx.play();
     brickCollision();
+    levelUp();
     gameStats(level, 35, 25, levelImg, 5, 5);
     gameStats(lives, canvas.width/2, 25, lifeImg, canvas.width/2 - 30, 5);
     gameStats(score, canvas.width - 25, 25, scoreImg, canvas.width - 55, 5);
@@ -241,9 +250,9 @@ function draw() {
     } if (y + ball.dy > canvas.height-ballRadius){
             ball.dy = -ball.dy;
             lives--;
-    } else if (y + ball.dy > canvas.height-ballRadius && lives <= 0){
+    } else if (lives <= 0){
         sounds.sfx.pause();
-        alert('Game Over You lose!');
+        alert('GAME OVER YOU LOSE!');
         document.location.reload();
         clearInterval(interval);
     }
