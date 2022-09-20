@@ -7,9 +7,9 @@ canvas {
     display: block;
 }
 
- #breakout {
+ /* #breakout {
     background: black;
- }
+ } */
 
   /* #play-button {
     background-color: aqua;
@@ -20,5 +20,5 @@ canvas {
 
 
  .scoreboard {
-    text-align: center;
+    text-align: left;
  }

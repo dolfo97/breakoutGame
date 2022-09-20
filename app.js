@@ -9,9 +9,19 @@ let y = canvas.height-30;
 let rightPressed = false;
 let leftPressed = false;
 let score = 0;
+let lives = 3;
+let level = 1;
 let background = new Image();
 const scoreboard = document.querySelector('.scoreboard');
 const ballRadius = 15;
+
+const lifeImg = new Image();
+lifeImg.src = 'heart.png';
+const scoreImg = new Image();
+scoreImg.src = 'score.png';
+const levelImg = new Image();
+levelImg.src = 'crown.png';
+
 
 
 const sounds = {
@@ -166,9 +176,7 @@ function brickCollision() {
                         ball.dy = -ball.dy;
                         b.status = false;
                         sounds.breakBreak.play();
-                        scoreboard.innerHTML = `Score: ${score}`;
                         score++;
-                        ball.fillStyle = '#' + Math.floor(Math.random()*16777214);
                         if (score === brick.row * brick.column) {
                             sounds.sfx.pause();
                             sounds.youWin.play();
@@ -182,6 +190,15 @@ function brickCollision() {
         }
     }
 }
+
+function gameStats(text, textX, textY, img, imgX, imgY) {
+    ctx.fillStyle = '#FFF';
+    ctx.font = '25px Arial';
+    ctx.fillText(text, textX, textY);
+    ctx.drawImage(img, imgX, imgY, width = 25, height = 25);
+}
+
+
 
 
 
@@ -201,7 +218,12 @@ function draw() {
     moveBall();
     sounds.sfx.play();
     brickCollision();
-    //paddleCollision();
+    gameStats(level, 35, 25, levelImg, 5, 5);
+    gameStats(lives, canvas.width/2, 25, lifeImg, canvas.width/2 - 30, 5);
+    gameStats(score, canvas.width - 25, 25, scoreImg, canvas.width - 55, 5);
+
+    
+    
 
     if(x + ball.dx > canvas.width-ballRadius || x + ball.dx < ballRadius) {
         ball.dx = -ball.dx;
@@ -215,16 +237,20 @@ function draw() {
         if(x > paddle.x && x < paddle.x + paddleWidth) {
             ball.dy = -ball.dy;
             sounds.bounce.play();
-        } else {
-            sounds.sfx.pause();
-            alert('Game Over You lose!');
-            document.location.reload();
-            clearInterval(interval);
-        }
+        } 
+    } if (y + ball.dy > canvas.height-ballRadius){
+            ball.dy = -ball.dy;
+            lives--;
+    } else if (y + ball.dy > canvas.height-ballRadius && lives <= 0){
+        sounds.sfx.pause();
+        alert('Game Over You lose!');
+        document.location.reload();
+        clearInterval(interval);
     }
 
     x += ball.dx;
     y += ball.dy;
+
 }
 
 let interval = setInterval(draw,10);
